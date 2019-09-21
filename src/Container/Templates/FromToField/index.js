@@ -184,7 +184,7 @@ class FromToField extends Component {
                 
                 
                 
-                
+                <Text>asd</Text>
                 <InputFieldx number={1} func={this.toggleModal_} label="Dari" ico="airplane-takeoff" value={this.state.v1} />
                 
                 
