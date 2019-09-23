@@ -11,6 +11,24 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from "react-native-modal";
 import KelasItem from '../../../components/molecules/KelasItem';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { set_state } from '../../../config/redux/actions/pesawat';
+const mapStateToProps = state => {
+    return {
+        pesawatReducer: state.pesawatReducer
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators(
+        {
+            set_state
+        },
+        dispatch
+    )
+}
+
 
 class KabinField extends Component {
     state = {
@@ -47,7 +65,7 @@ class KabinField extends Component {
                                     fontWeight: '600',
                                     fontFamily: 'OpenSans-SemiBold'
                                 }}
-                            >{this.state.selectedClass.name}</Text>
+                            >{this.props.pesawatReducer.cabinClass}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -63,13 +81,22 @@ class KabinField extends Component {
                             </Text>
                         </View>
                         <View style={{ paddingHorizontal: 16 }}>
-                            <TouchableOpacity onPress={() => this.setState({ visibleModal: null, selectedClass: { id: 1, name: "Ekonomi" } })} >
+                            <TouchableOpacity onPress={() => {
+                                this.props.set_state({ cabinClass: "ECONOMY", cabinClassCode: 1 })
+                                this.setState({ visibleModal: null })
+                            }} >
                                 <KelasItem active={this.state.selectedClass.id == 1 ? 1 : 0} id={1} name="Ekonomi" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => this.setState({ visibleModal: null, selectedClass: { id: 2, name: "First" } })} >
+                            <TouchableOpacity onPress={() => {
+                                this.props.set_state({ cabinClass: "FIRST", cabinClassCode: 2 })
+                                this.setState({ visibleModal: null })
+                            }} >
                                 <KelasItem active={this.state.selectedClass.id == 2 ? 1 : 0} id={2} name="First" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => this.setState({ visibleModal: null, selectedClass: { id: 3, name: "Bisnis" } })} >
+                            <TouchableOpacity onPress={() => {
+                                this.props.set_state({ cabinClass: "Bisnis", cabinClassCode: "BUSINES" })
+                                this.setState({ visibleModal: null })
+                            }} >
                                 <KelasItem active={this.state.selectedClass.id == 3 ? 1 : 0} id={3} name="Bisnis" />
                             </TouchableOpacity>
                         </View>
@@ -93,4 +120,6 @@ const styles = StyleSheet.create({
         margin: 0,
     },
 });
-export default KabinField
+// export default KabinField
+
+export default connect(mapStateToProps, mapDispatchToProps)(KabinField)

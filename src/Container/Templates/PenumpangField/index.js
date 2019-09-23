@@ -21,6 +21,23 @@ import Picker from 'react-native-wheel-picker'
 var PickerItem = Picker.Item;
 
 // import { Picker, DatePicker } from 'react-native-wheel-pick';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { set_state } from '../../../config/redux/actions/pesawat';
+const mapStateToProps = state => {
+    return {
+        pesawatReducer: state.pesawatReducer
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators(
+        {
+            set_state
+        },
+        dispatch
+    )
+}
 
 let count = 0;
 const len = 10;
@@ -33,13 +50,6 @@ class PenumpangField extends Component {
         selectedDewasa: 0,
         selectedAnak: 0,
 
-        tmpDewasa: '1',
-        tmpAnak: '1',
-        tmpBayi: 'ee',
-
-        dewasa: '1',
-        anak: '1',
-        bayi: '0',
 
         backgroundColor: 'white',
         arrDewasa: ['1', '2', '3', '4', '5', '6', '7',],
@@ -50,6 +60,14 @@ class PenumpangField extends Component {
 
     };
 
+    _handlePress(){
+        this.setState({isModalVisible: false})
+        this.props.set_state({
+            penumpangAnak: this.state.selectedAnak,
+            penumpangDewasa: this.state.selectedDewasa + 1,
+            penumpangBayi: this.state.selectedBayi,
+        })
+    }
 
     dewasaChanged = (value) => {
 
@@ -64,18 +82,14 @@ class PenumpangField extends Component {
                 arx[x] = x.toString();
             }
             this.setState({ arrAnak: arx });
-
-
             if (this.state.selectedBayi > value) {
                 this.setState({ selectedBayi: value + 1 })
             }
-
             var arx = []
             for (var x = 0; x <= sisaBayi + 1; x++) {
                 arx[x] = x.toString();
             }
             this.setState({ arrBayi: arx, });
-
             if (this.state.selectedAnak + value > 6) {
                 console.log("LASTO", sisaAnak)
                 this.setState({ selectedAnak: sisaAnak - 1 })
@@ -83,8 +97,6 @@ class PenumpangField extends Component {
 
         })
     }
-
-
     anakChanged = (value) => {
         this.setState({ selectedAnak: value });
     }
@@ -119,7 +131,12 @@ class PenumpangField extends Component {
                                     fontFamily: 'OpenSans-SemiBold'
                                 }}
 
-                            ></Text>
+                            >
+
+                                {this.props.pesawatReducer.penumpangDewasa ? this.props.pesawatReducer.penumpangDewasa + " Dewasa " : null}
+                                {this.props.pesawatReducer.penumpangAnak ? this.props.pesawatReducer.penumpangAnak + " Anak " : null}
+                                {this.props.pesawatReducer.penumpangBayi ? this.props.pesawatReducer.penumpangBayi + " Bayi " : null}
+                            </Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -200,15 +217,7 @@ class PenumpangField extends Component {
                                 style={{ marginTop: 8, alignItems: 'center', justifyContent: 'center', height: 48, borderRadius: 50, backgroundColor: '#146DC2', color: '#FFFFFF' }}
                                 onPress={() => {
 
-                                    console.log(this.state.penumpang);
-                                    this.setState({
-                                        penumpangx: {
-                                            bayi: this.state.penumpang.tmpBayi,
-                                            dewasa: this.state.penumpang.tmpDewasa,
-                                            anak: this.state.penumpang.tmpAnak,
-                                        }
-                                    })
-                                    this.setState({ visibleModal: null })
+                                    this._handlePress();
                                 }
                                 }
                             ><Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600', fontFamily: 'OpenSans-SemiBold' }}>SELESAI</Text>
@@ -229,4 +238,4 @@ const styles = StyleSheet.create({
     },
 
 });
-export default PenumpangField
+export default connect(mapStateToProps, mapDispatchToProps)(PenumpangField)

@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 class OptionCity extends Component {
     _onPress() {
-        this.props.onPressItem(this.props.code, this.props.city);
+        this.props.onPressItem(this.props.code, this.props.city, this.props.type);
     }
     render() {
         return (

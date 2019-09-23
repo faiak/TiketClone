@@ -32,6 +32,27 @@ import {
 import InputFieldx from '../../../components/molecules/InputFieldx';
 import InputBaru from '../../../components/molecules/InputBaru';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { set_state } from '../../../config/redux/actions/pesawat';
+const mapStateToProps = state => {
+    return {
+        pesawatReducer: state.pesawatReducer
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators(
+        {
+            set_state
+        },
+        dispatch
+    )
+}
+
+
+
+
 const zoomOut = {
     0: {
         opacity: 1,
@@ -77,8 +98,6 @@ class FromToField extends Component {
         this.spin();
     }
 
-
-
     getMoviesFromApiAsync() {
         return fetch('https://m.tiket.com/ms-gateway/tix-flight-master-discovery/popularDestination/findPopularCity')
             .then((response) => response.json())
@@ -99,32 +118,21 @@ class FromToField extends Component {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     };
     changeValue = () => {
-        var tmp = this.state.v2;
-        var tmp2 = this.state.v1;
-        this.setState({ v2: tmp2, v1: tmp })
-        
-        // this.refs.child2.bounceOut(800).then(endState => {
-        //     if (endState.finished) {
-        //         this.setState({ v2: tmp2 })
-        //         this.refs.child2.bounceIn(1500).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
-        //     }
-        // })
-
-
-
-        // this.refs.child.bounceOut(800).then(endState => {
-        //     if (endState.finished) {
-        //         this.setState({ v1: tmp })
-        //         this.refs.child.bounceIn(1500).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
-        //     }
-        // })
-
+        var tmp = this.props.pesawatReducer.airportTo
+        var tmp2 = this.props.pesawatReducer.airportFrom
+        this.props.set_state({ airportFrom: tmp, airportTo: tmp2 })
+        var tmp = this.props.pesawatReducer.airportToCode
+        var tmp2 = this.props.pesawatReducer.airportFromCode
+        this.props.set_state({ airportFromCode: tmp, airportToCode: tmp2 })
+        var tmp = this.props.pesawatReducer.arrivedType
+        var tmp2 = this.props.pesawatReducer.departedType
+        this.props.set_state({ departedType: tmp, arrivedType: tmp2 })
     }
-    _onPressItem = (code, city) => {
+    _onPressItem = (code, city, type) => {
         if (this.state.vselect === 1)
-            this.setState({ v1: city + " (" + code + ")" })
+            this.props.set_state({ airportFrom: city, airportFromCode: code, departedType: type })
         else
-            this.setState({ v2: city + " (" + code + ")" })
+            this.props.set_state({ airportTo: city, airportToCode: code, arrivedType: type })
         this.toggleModal();
     };
 
@@ -171,43 +179,21 @@ class FromToField extends Component {
     }
 
     fungsi_state_baru = (value) => {
-        this.setState({state_baru: value});
+        this.setState({ state_baru: value });
     }
 
     render() {
-
         return (
             <View style={{ borderBottomWidth: 1, marginBottom: 8, borderBottomColor: '#dee2ee' }}>
-                <Text>{this.state.state_baru}</Text>
-                
-                <InputBaru func={this.fungsi_state_baru} value={this.state.state_baru} label="Dari" ico="airplane-takeoff" ></InputBaru>
-                
-                
-                
-                <Text>asd</Text>
-                <InputFieldx number={1} func={this.toggleModal_} label="Dari" ico="airplane-takeoff" value={this.state.v1} />
-                
-                
-                
-                
+
+                <InputFieldx number={1} func={this.toggleModal_} label="Dari" ico="airplane-takeoff" value={this.props.pesawatReducer.airportFrom + " (" + this.props.pesawatReducer.airportFromCode + ")"}  />
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                     <Dash dashThickness={1} dashStyle={{ backgroundColor: '#dee2ee' }} style={{ marginRight: 0, alignItems: 'center', flex: 1, borderColor: '#8a93a7' }} />
                     <TouchableOpacity onPress={this.changeValue} style={{ backgroundColor: 'white', borderWidth: 0.3, borderColor: '#8a93a7', borderRadius: 50, width: 35, height: 35, justifyContent: 'center', alignItems: 'center' }}>
                         <Icon style={{ justifyContent: 'center', alignItems: 'center' }} name="sync" size={15} color="#0064d2" />
                     </TouchableOpacity>
                 </View>
-
-
-
-                <InputFieldx number={2} func={this.toggleModal_} label="Ke" ico="airplane-landing" value={this.state.v2} />
-
-
-
-
-
-
-
-
+                <InputFieldx number={2} func={this.toggleModal_} label="Ke" ico="airplane-landing" value={this.props.pesawatReducer.airportTo + " (" + this.props.pesawatReducer.airportToCode + ")"} />
                 <Modal style={{ backgroundColor: 'white', margin: 0, padding: 0 }}
                     isVisible={this.state.isModalVisible}>
                     <View style={{ flex: 1, direction: "row" }}>
@@ -250,13 +236,11 @@ class FromToField extends Component {
                                 data={this.state.airportList}
                                 renderItem={
                                     ({ item }) =>
-                                        <OptionCity onPressItem={this._onPressItem} city={item.airportName} code={item.airportCode} />
+                                        <OptionCity onPressItem={this._onPressItem} type={item.type.toUpperCase()} city={item.airportName} code={item.airportCode} />
                                 }
                                 keyExtractor={(item, index) => index.toString()}
-
                             />
                         </View>
-
                     </View>
                 </Modal>
             </View>
@@ -264,4 +248,7 @@ class FromToField extends Component {
     }
 }
 
-export default FromToField
+
+export default connect(mapStateToProps, mapDispatchToProps)(FromToField)
+
+// export default FromToField

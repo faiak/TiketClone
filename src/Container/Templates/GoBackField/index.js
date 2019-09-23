@@ -12,8 +12,28 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DatePicker from 'react-native-date-ranges';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { set_state } from '../../../config/redux/actions/pesawat';
+const mapStateToProps = state => {
+  return {
+    pesawatReducer: state.pesawatReducer
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators(
+    {
+      set_state
+    },
+    dispatch
+  )
+}
+
+
+
 class GoBackField extends Component {
-  
+
   state = {
     isModalVisible: false,
     dateGo: "Sab, 14 Sep 2019",
@@ -49,7 +69,7 @@ class GoBackField extends Component {
     return (
       <View>
         <View style={{ borderBottomWidth: 1, marginBottom: 8, borderBottomColor: '#dee2ee', flexDirection: 'row' }}>
-          
+
           <View style={{ flex: 1 }}>
             <TouchableOpacity onPress={this.accessChild} >
               <Text style={{ color: '#8a93a7' }}>Pergi</Text>
@@ -74,7 +94,7 @@ class GoBackField extends Component {
                     fontWeight: '600',
                     fontFamily: 'OpenSans-SemiBold'
                   }}
-                >{this.state.dateGo}</Text>
+                >{this.props.pesawatReducer.dateGo}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -88,7 +108,7 @@ class GoBackField extends Component {
               transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }]
             }}
               trackColor="#B4E1FF"
-              onValueChange={this.toggleSwitch} 
+              onValueChange={this.toggleSwitch}
               value={this.state.switchValue}
             />
           </View>
@@ -132,14 +152,14 @@ class GoBackField extends Component {
 
 
         <DatePicker
-          returnFormat="DD MM YYYY"
+          returnFormat="YYYY-MM-DD"
           onConfirm={(value) => {
-            console.log(value); this.setState({
+            console.log(value);
+            this.props.set_state({
               dateGo: value.startDate ? value.startDate : value.currentDate,
               dateBack: value.endDate
             })
           }}
-          // onConfirm={function(){alert("x")}}
           title="asd"
           selectedBgColor="#FFF5B2"
           selectedBgColorSoft="#FEDD00"
@@ -169,4 +189,6 @@ class GoBackField extends Component {
   }
 }
 
-export default GoBackField
+// export default GoBackField
+
+export default connect(mapStateToProps, mapDispatchToProps)(GoBackField)
